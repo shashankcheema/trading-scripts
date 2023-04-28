@@ -1,0 +1,79 @@
+//@version=4
+strategy("My Strategy", overlay=true)
+
+// Moving Averages
+ma1 = sma(close, 20)
+ma2 = sma(close, 50)
+
+// Bollinger Bands
+basis = sma(close, 20)
+dev = stdev(close, 20)
+upper = basis + 2 * dev
+lower = basis - 2 * dev
+
+// Greedy Strategy
+longCondition = crossover(ma1, ma2)
+if (longCondition)
+    strategy.entry("Buy", strategy.long)
+    
+shortCondition = crossunder(ma1, ma2)
+if (shortCondition)
+    strategy.entry("Sell", strategy.short)
+    
+// Edge Patterns
+edgeUp = rising(close, 10)
+edgeDown = falling(close, 10)
+
+plotshape(edgeUp, title="Rising Edge", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)
+plotshape(edgeDown, title="Falling Edge", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)
+
+// Triangle Patterns
+// Upward Triangle Pattern
+tri_high = highest(high, 15)
+tri_low = lowest(low, 15)
+
+height = tri_high - tri_low
+half_height = height / 2
+
+tri_top = tri_high - half_height
+tri_bottom = tri_low + half_height
+
+tri_left = bar_index - 15
+tri_right = bar_index
+
+triangleUp = high >= tri_top and low <= tri_bottom and bar_index >= tri_left and bar_index <= tri_right
+
+// Downward Triangle Pattern
+tri_high_down = highest(high, 15)
+tri_low_down = lowest(low, 15)
+
+height_down = tri_high_down - tri_low_down
+half_height_down = height_down / 2
+
+tri_top_down = tri_low_down + half_height_down
+tri_bottom_down = tri_high_down - half_height_down
+
+tri_left_down = bar_index - 15
+tri_right_down = bar_index
+
+triangleDown = high <= tri_top_down and low >= tri_bottom_down and bar_index >= tri_left_down and bar_index <= tri_right_down
+
+plotshape(triangleUp, title="Triangle Up", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)
+plotshape(triangleDown, title="Triangle Down", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)
+
+// Support and Resistance
+supp = pivotlow(low, 14, 5)
+res = pivothigh(high, 14, 5)
+
+plot(supp, title="Support", color=color.green, linewidth=1)
+plot(res, title="Resistance", color=color.red, linewidth=1)
+
+// Plotting
+plot(ma1, title="MA 1", color=color.orange, linewidth=1)
+plot(ma2, title="MA 2", color=color.blue, linewidth=1)
+
+plot(basis, title="Basis", color=color.gray, linewidth=1)
+plot(upper, title="Upper Band", color=color.blue, linewidth=1)
+plot(lower, title="Lower Band", color=color.blue, linewidth=1, transp=90)
+
+
