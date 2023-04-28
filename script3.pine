@@ -1,0 +1,27 @@
+//@version=4
+strategy("Moving Average and Bollinger Bands with Greedy Strategy and Edge Patterns")
+
+// Define length of moving averages and standard deviation for Bollinger Bands
+ma_length = input(title="Moving Average Length", type=input.integer, defval=20)
+bb_length = input(title="Bollinger Band Length", type=input.integer, defval=20)
+bb_stddev = input(title="Bollinger Band Standard Deviation", type=input.float, defval=2.0)
+
+// Calculate moving averages and Bollinger Bands
+ma = sma(close, ma_length)
+upper_band = ma + bb_stddev * stdev(close, bb_length)
+lower_band = ma - bb_stddev * stdev(close, bb_length)
+
+// Plot moving averages and Bollinger Bands
+plot(ma, color=color.blue, title="Moving Average")
+plot(upper_band, color=color.green, title="Upper Bollinger Band")
+plot(lower_band, color=color.red, title="Lower Bollinger Band")
+
+// Define buy and sell signals based on greedy strategy and edge patterns
+buy_signal = crossover(close, upper_band) and (falling(close, 5) or rising(close, 5))
+sell_signal = crossunder(close, lower_band)
+
+// Execute trades based on signals
+if (buy_signal)
+    strategy.entry("Buy", strategy.long)
+if (sell_signal)
+    strategy.entry("Sell", strategy.short)
